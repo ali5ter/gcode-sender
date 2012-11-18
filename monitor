@@ -1,0 +1,83 @@
+#!/bin/bash -x
+#
+# @file monitor
+# ☆  Script talk to an Ardiuno via its USB connection
+# @author Alister Lewis-Bowen <alister@different.com>
+# @requires color <http://code.google.com/p/ansi-color/>
+#
+# This software is distributed under the the MIT License.
+#
+# Copyright (c) 2012 Alister Lewis-Bowen
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+BASE=$( cd "$( dirname "$0" )" && pwd )
+#
+# USB Serial Device for Arduino Uno on OSX
+#
+# @see http://lists.berlios.de/pipermail/gpsd-dev/2005-April/001288.html
+#
+USB_DEVICE='/dev/cu.usbmodemfd131'
+#
+# Script to listen to the  USB device
+#
+LISTENER=$BASE/listener
+#
+# PID of the listener script
+#
+LISTENER_PID=''
+
+function _init {
+    [ ! -e $USB_DEVICE ] && {
+        echo "$(color red)Unable to see a USB device at $USB_DEVICE.$(color)"
+        exit 1
+    }
+    $LISTENER &
+    LPID=$(ps aux | grep $LISTENER | grep -v 'grep' | awk '{print $2}')
+    sleep 1 # wait for listener to init
+    echo "$(color green)Starting conversation with Arduino...$(color)"
+    echo
+
+}
+
+function _exit {
+    echo "$(color green)Closing converation.$(color)"
+    echo
+    kill -9 $LISTENER_PID &>/dev/null
+    exit 0
+}
+
+function _send {
+    local input="$1"
+    echo "$input" > $USB_DEVICE
+    sleep 1
+}
+
+_init
+while true; do
+    echo -n "$(color yellow)[usb-device] > $(color)"
+    read input
+    case "$input" in
+        "exit"|"bye"|"close") _exit;;
+        *)
+            _send "$input"
+            echo
+            ;;
+    esac
+done;
