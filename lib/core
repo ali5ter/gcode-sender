@@ -1,7 +1,6 @@
-#!/bin/bash
 #
-# @file listener
-# ☆  Script to echo the USB connection to an Ardiuno
+# @file core
+# ☆  Core vars and functions for gcode_sender
 # @author Alister Lewis-Bowen <alister@different.com>
 # @requires color <http://code.google.com/p/ansi-color/>
 #
@@ -28,17 +27,26 @@
 # SOFTWARE.
 
 #
-# USB Serial Device to Arduino Uno
+# Starting directory
 #
-# @see http://lists.berlios.de/pipermail/gpsd-dev/2005-April/001288.html
+BASE=$( cd "$( dirname "$0" )" && pwd )
 #
-USB_DEVICE='/dev/cu.usbmodemfd131'
-
-[ ! -e $USB_DEVICE ] && {
-    echo "$(color red)Unable to find a device at $USB_DEVICE.$(color)"
-    exit 1
-}
-
-#stty -a < $USB_DEVICE  # show state of the tty
-
-cat <$USB_DEVICE
+# Lib directory
+#
+LIB=$BASE/lib
+#
+# Script to listen to the  USB device
+#
+LISTENER=$LIB/listener
+#
+# PID of the listener script
+#
+LISTENER_PID=''
+#
+# Modes
+# @see http://phrasegenerator.com/food
+#
+START_UP='Sizzling Abalone and Kale Chunks tossed with Stewed Meat'
+RAW='Creamy Rice Shish-Kebab on a bed of Dried Pulled Pork and Mussel Slices'
+JOG='Deep-fried Spam Sandwich with Turkey and Duck Sushi'
+MODE=$START_UP

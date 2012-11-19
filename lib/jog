@@ -1,0 +1,126 @@
+#
+# @file jog
+# ☆  Jog logic for gcode_sender
+# @author Alister Lewis-Bowen <alister@different.com>
+# @requires color <http://code.google.com/p/ansi-color/>
+#
+# This software is distributed under the the MIT License.
+#
+# Copyright (c) 2012 Alister Lewis-Bowen
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+#
+# Positions
+#
+XPOS=0
+YPOS=0
+ZPOS=0
+#
+# Jog step distance
+#
+JOG_STEP=5
+#
+# Keys
+#
+KEY_UP='27:91:65'
+KEY_DOWN='27:91:66'
+KEY_RIGHT='27:91:67'
+KEY_LEFT='27:91:68'
+KEY_ESC=27
+KEY_A=97
+KEY_Z=122
+KEY_H=104
+KEY_C=99
+
+#
+# Jog functions
+#
+jogXRight ()    { XPOS=$(( $XPOS + $JOG_STEP )); jogSend; }
+jogXLeft ()     { XPOS=$(( $XPOS - $JOG_STEP )); jogSend; }
+jogYForward ()  { YPOS=$(( $YPOS + $JOG_STEP )); jogSend; }
+jogYBackward () { YPOS=$(( $YPOS - $JOG_STEP )); jogSend; }
+jogZUp ()       { ZPOS=$(( $ZPOS + $JOG_STEP )); jogSend; }
+jogZDown ()     { ZPOS=$(( $ZPOS - $JOG_STEP )); jogSend; }
+jogHome ()      { XPOS=0; YPOS=0; ZPOS=0; }
+jogSend ()      { conSend "$XPOS $YPOS $ZPOS"; }
+
+function jogStatus {
+    printf "$(color bd white blue) Jog Mode: x=%04d y=%04d y=%04d $(color)\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b" \
+        $XPOS $YPOS $ZPOS
+}
+
+function jogCommands {
+    local helpText="$(color yellow)
+escape ......... exit jog mode
+cursor up ...... Y backward one step
+cursor down .... Y forward one step
+cursor left .... X left one step
+cursor right ... X right one step
+a .............. X up one step
+z .............. Z up one step
+h .............. home
+c .............. show commands
+
+Jog step set to $JOG_STEP actual steps.
+$(color)"
+    echo "$helpText"
+}
+
+function _parseEscapeSeq {
+    local key=$(printf '%d' "'$1")
+    local ttyState=$(stty -g)
+    local chars=''
+    local charnum=''
+    [ $key -eq 27 ] && {
+        stty -icanon min 0 time 0
+        read -s chars
+        if [ ${#chars} -gt 0 ]; then
+            for (( i=0;i<${#chars};i+=1 )); do
+                charnum=$(printf '%d' "'${chars:$i:1}")
+                key="$key:$charnum"
+            done
+        fi
+        stty $ttyState &>/dev/null
+    }
+    echo "$key"
+}
+
+function jogMode {
+    local char=''
+    local key=''
+    MODE=$JOG
+    jogCommands
+    jogStatus
+    while read -n1 -s char; do
+        key=$(_parseEscapeSeq $char)
+        #echo "char=$char , key=$key"
+        case "$key" in
+            $KEY_ESC)   MODE=$RAW; echo; break;;
+            $KEY_UP)    jogYBackward; jogStatus;;
+            $KEY_DOWN)  jogYForward; jogStatus;;
+            $KEY_RIGHT) jogXRight; jogStatus;;
+            $KEY_LEFT)  jogXLeft; jogStatus;;
+            $KEY_A)     jogZUp; jogStatus;;
+            $KEY_Z)     jogZDown; jogStatus;;
+            $KEY_H)     jogHome; jogStatus;;
+            $KEY_C)     echo; jogCommands; jogStatus;;
+        esac
+    done
+}
