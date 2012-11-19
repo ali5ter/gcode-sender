@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 #
 # @file monitor
 # ☆  Script talk to an Ardiuno via its USB connection
@@ -33,6 +33,7 @@ BASE=$( cd "$( dirname "$0" )" && pwd )
 #
 # @see http://lists.berlios.de/pipermail/gpsd-dev/2005-April/001288.html
 #
+# TODO: Some configuration to determine device...
 USB_DEVICE='/dev/cu.usbmodemfd131'
 #
 # Script to listen to the  USB device
@@ -42,6 +43,20 @@ LISTENER=$BASE/listener
 # PID of the listener script
 #
 LISTENER_PID=''
+#
+# Modes
+#
+START_UP='rangy rush fetor mauve'
+RUNNING='atop mackerel fairing hump'
+MODE=$START_UP
+
+function _help {
+    local helpText="$(color yellow)Some help text to come :)
+Something about '$' to dump grbl settings and 'exit' to quit the monior.
+$(color)
+"
+    echo "$helpText"
+}
 
 function _init {
     [ ! -e $USB_DEVICE ] && {
@@ -49,8 +64,8 @@ function _init {
         exit 1
     }
     $LISTENER &
-    LPID=$(ps aux | grep $LISTENER | grep -v 'grep' | awk '{print $2}')
-    sleep 1 # wait for listener to init
+    LISTENER_PID=$(ps aux | grep $LISTENER | grep -v 'grep' | awk '{print $2}')
+    sleep 1 # wait for Arduino to init
     echo "$(color green)Starting conversation with Arduino...$(color)"
     echo
 
@@ -59,25 +74,28 @@ function _init {
 function _exit {
     echo "$(color green)Closing converation.$(color)"
     echo
-    kill -9 $LISTENER_PID &>/dev/null
+    kill -9 $LISTENER_PID
     exit 0
 }
 
 function _send {
     local input="$1"
     echo "$input" > $USB_DEVICE
-    sleep 1
+    sleep 1 # wait for Arduino to respond
 }
 
 _init
 while true; do
+    [ "$MODE" == "$START_UP" ] && _help
     echo -n "$(color yellow)[usb-device] > $(color)"
     read input
     case "$input" in
+        "help") _help;;
         "exit"|"bye"|"close") _exit;;
         *)
             _send "$input"
             echo
             ;;
     esac
+    MODE=$RUNNING
 done;
