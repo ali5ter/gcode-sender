@@ -58,7 +58,7 @@ jogYForward ()  { YPOS=$(( $YPOS + $JOG_STEP )); jogSend; }
 jogYBackward () { YPOS=$(( $YPOS - $JOG_STEP )); jogSend; }
 jogZUp ()       { ZPOS=$(( $ZPOS + $JOG_STEP )); jogSend; }
 jogZDown ()     { ZPOS=$(( $ZPOS - $JOG_STEP )); jogSend; }
-jogHome ()      { XPOS=0; YPOS=0; ZPOS=0; }
+jogHome ()      { XPOS=0; YPOS=0; ZPOS=0; jogSend; }
 jogSend ()      { conSend "$XPOS $YPOS $ZPOS"; }
 
 function jogStatus {
