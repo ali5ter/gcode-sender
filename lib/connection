@@ -3,6 +3,7 @@
 # ☆  Connection functions for gcode_sender
 # @author Alister Lewis-Bowen <alister@different.com>
 # @requires color <http://code.google.com/p/ansi-color/>
+# @see http://lists.berlios.de/pipermail/gpsd-dev/2005-April/001288.html
 #
 # This software is distributed under the the MIT License.
 #
@@ -27,19 +28,51 @@
 # SOFTWARE.
 
 #
-# USB Serial Device to Arduino Uno
+# Device store file
 #
-# @see http://lists.berlios.de/pipermail/gpsd-dev/2005-April/001288.html
-#
-USB_DEVICE='/dev/cu.usbmodemfd131'
+DEVICE_STORE=~/.gcode_device_store
 
-# TODO: Add mode to allow device to be changed
+function conRemoveDeviceStore {
+    rm -fR $DEVICE_STORE &>/dev/null
+}
+
+function conGetDevice {
+    [ -r $DEVICE_STORE ] && {
+        DEVICE=$(cat $DEVICE_STORE)
+        return 0
+    }
+    conRemoveDeviceStore
+
+    local _ifs=$IFS
+    local devices=($(ls -1 /dev/cu.usb*))
+    local num=${#devices[@]}
+    IFS=$_ifs
+
+    [ $num -eq 0 ] && {
+        echo "$(color red)Unable to find any USB devices.$(color)"
+        exit 1;
+    }
+
+    if [ $num -eq 1 ]; then
+        DEVICE="${devices[0]}"
+        echo -n "$DEVICE" > $DEVICE_STORE
+    else
+        echo -e "$(color yellow)The following devices are available:"
+        for (( i=0; i<$num; i+=1 )); do
+            echo -e "$(($i+1))\t${devices[$i]}"
+        done
+        while true; do
+            read -p "Please choose a device: " opt
+            [ $opt -gt 0 -a $opt -lt $((num+1)) ] && break
+        done
+        echo $(color)
+        DEVICE="${devices[$(($opt-1))]}"
+        echo $DEVICE > $DEVICE_STORE
+    fi
+}
 
 function conOpen {
-    [ ! -e $USB_DEVICE ] && {
-        echo "$(color red)Unable to find a device at $USB_DEVICE.$(color)"
-        exit 1
-    }
+    conGetDevice
     conListen
     echo "$(color green)Connecting with Arduino...$(color)"
     echo
@@ -56,13 +89,13 @@ function conClose {
 
 function conSend {
     local input="$1"
-    [ ! -e $USB_DEVICE ] && return 0;
-    echo "$input" > $USB_DEVICE
+    [ -z $DEVICE ] && return 1;
+    echo "$input" > $DEVICE
     sleep 1 # wait for Arduino to respond
 }
 
 function conListen {
-    [ ! -e $USB_DEVICE ] && return 0;
+    [ -z $DEVICE ] && return 1;
     $LISTENER &
     LISTENER_PID=$(ps aux | grep $LISTENER | grep -v 'grep' | awk '{print $2}')
 }

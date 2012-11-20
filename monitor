@@ -61,7 +61,8 @@ $(color)
 }
 
 case "$1" in
-    '-h'|'--help'|'help') _helpCmd;;
+    '-h'|'--help'|'help')   _helpCmd;;
+    '--new-device')         conRemoveDeviceStore;;
 esac
 
 # TODO: Migrate connection control into command loop

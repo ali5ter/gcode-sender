@@ -27,6 +27,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+#
+# Bootstrap
+#
+BASE=$( cd "$( dirname "$0" )" && pwd )
+source $BASE/connection # connection logic
+
+conGetDevice
+
 # TODO: Find a way to format output through parsing
 
-cat <$USB_DEVICE
+cat <$DEVICE
