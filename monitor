@@ -1,7 +1,9 @@
 #!/bin/bash
 #
 # @file monitor
-# ☆  Script talk to an Ardiuno via its USB connection
+# ☆  Script that talks with the Arduino GrblShield providing a monitor feature
+#    ala the Arduino Serial Monitor Tool. A jog mode is also provided to move
+#    the X, Y, Z axis using keystrokes of the keyboard.
 # @author Alister Lewis-Bowen <alister@different.com>
 # @requires color <http://code.google.com/p/ansi-color/>
 #
@@ -34,14 +36,17 @@ LIB=$( cd "$( dirname "$0" )" && pwd )/lib
 source $LIB/core       # core vars and functions
 source $LIB/connection # connection logic
 source $LIB/jog        # jog mode
+source $LIB/waypoints  # waypoint manager
 
 function _helpCmd {
-    local helpText="$(color yellow)
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id convallis
-quam. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi lacinia
-interdum purus, suscipit venenatis enim vestibulum id. Nam cursus, tellus a
-egestas consequat, turpis libero vestibulum nulla, sed gravida nibh mauris
-non tellus.
+    local helpText="
+$(color bd)Arduino GrblShield Serial Monitor Tool$(color)
+
+Usage: $(color bd)monitor [$(color ul)options$(color bd)]$(color)
+
+Options:
+--clear-device      Delete the stored USB device
+--clear-waypoints   Delete any stored waypoints
 $(color)
 "
     echo "$helpText"
@@ -49,20 +54,26 @@ $(color)
 }
 
 function _helpLoop {
-    local helpText="$(color yellow)
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent id convallis
-quam. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi lacinia
-interdum purus, suscipit venenatis enim vestibulum id. Nam cursus, tellus a
-egestas consequat, turpis libero vestibulum nulla, sed gravida nibh mauris
-non tellus.
-$(color)
-"
+    local helpText="$(color yellow)$(color bd)Arduino GrblShield Serial \
+Monitor Tool commands:$(color)
+:jog, :j .......... enter jog mode
+:homei, :h ........ attempt to move X, Y, Z axis to zero
+:limit, ........... record current X, Y, Z co-ords as the maximum limit
+:set, :s $(color ul)wp$(color) ... set current X, Y, Z position as a waypoint \
+named $(color ul)wp$(color)
+:go, :g $(color ul)wp$(color) .... move X, Y, Z position it waypoint named \
+$(color ul)wp$(color)
+:list, :l ......... list all waypoints
+:exit, :e ......... exit from monitor
+:commands, :c ..... show commands
+$(color)"
     echo "$helpText"
 }
 
 case "$1" in
     '-h'|'--help'|'help')   _helpCmd;;
-    '--new-device')         conRemoveDeviceStore;;
+    '--clear-device')       conRemoveStore;;
+    '--clear-waypoints')    wpRemoveSore;;
 esac
 
 # TODO: Migrate connection control into command loop
@@ -77,10 +88,14 @@ while true; do
     read input
 
     case "$input" in
-        'help') _helpLoop;;
-        'exit') conClose;;
-        'jog')  jogMode;;
-        'home') jogHome;;
+        ':commands'|':c')   _helpLoop;;
+        ':exit'|':e')       conClose;;
+        ':jog'|':j')        jogMode;;
+        ':home'|':h')       jogHome;;
+        ':limit')           wpStoreLimit;;
+        ':set'|':s')        wpStore $2;;
+        ':go'|':g')         wpGoto $2;;
+        ':list'|':l')       wpList;;
         *)  # Process raw input
             conSend "$input"
             echo

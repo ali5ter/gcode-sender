@@ -51,6 +51,12 @@ RAW='Creamy Rice Shish-Kebab on a bed of Dried Pulled Pork and Mussel Slices'
 JOG='Deep-fried Spam Sandwich with Turkey and Duck Sushi'
 MODE=$START_UP
 #
+# Positions
+#
+XPOS=0
+YPOS=0
+ZPOS=0
+#
 # Keys
 #
 KEY_UP='27:91:65'

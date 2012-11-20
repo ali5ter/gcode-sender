@@ -32,8 +32,8 @@
 #
 DEVICE_STORE=~/.gcode_device_store
 
-function conRemoveDeviceStore {
-    rm -fR $DEVICE_STORE &>/dev/null
+function conRemoveStore {
+    rm -fR $DEVICE_STORE 2>/dev/null
 }
 
 function conGetDevice {
@@ -41,7 +41,7 @@ function conGetDevice {
         DEVICE=$(cat $DEVICE_STORE)
         return 0
     }
-    conRemoveDeviceStore
+    conRemoveStore
 
     local _ifs=$IFS
     local devices=($(ls -1 /dev/cu.usb* 2>/dev/null))
