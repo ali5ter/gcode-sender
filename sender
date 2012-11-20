@@ -1,11 +1,10 @@
 #!/bin/bash
 #
-# @file monitor
-# ☆  Script that talks with the Arduino GrblShield providing a monitor feature
-#    ala the Arduino Serial Monitor Tool. A jog mode is also provided to move
-#    the X, Y, Z axis using keystrokes of the keyboard.
+# @file sender
+# ☆  Script to send g-code to the Arduino GrblShield
 # @author Alister Lewis-Bowen <alister@different.com>
 # @requires color <http://code.google.com/p/ansi-color/>
+# @see https://github.com/winder/Universal-G-Code-Sender
 #
 # This software is distributed under the the MIT License.
 #
@@ -35,46 +34,68 @@
 LIB=$( cd "$( dirname "$0" )" && pwd )/lib
 source $LIB/core       # core vars and functions
 source $LIB/connection # connection logic
-source $LIB/jog        # jog mode
-source $LIB/waypoints  # waypoint manager
+#
+# G-code instructions
+#
+GCODE=()
+#
+# Total g-code instructions
+#
+TOTAL_LINES=${#GCODE[@]}
+#
+# Current g-code instruction
+#
+CURRENT_LINE=0
+#
+# Current g-code instruction
+#
+LINES_BATCHED=3
 
 function _helpCmd {
     local helpText="
-$(color bd)Arduino GrblShield Serial Monitor Tool$(color)
+$(color bd)G-code sender for Arduino GrblShield$(color)
 
-Usage: $(color bd)monitor [$(color ul)options$(color bd)]$(color)
-
-Options:
---clear-device      Delete the stored USB device
---clear-waypoints   Delete any stored waypoints
-$(color)
+$(color bd)Usage: sender $(color ul)g-code-file$(color)
 "
     echo "$helpText"
-    exit 0;
 }
 
 function _helpLoop {
-    local helpText="$(color yellow)$(color bd)Arduino GrblShield Serial \
-Monitor Tool commands:$(color)
-:jog, :j .......... enter jog mode
-:homei, :h ........ attempt to move X, Y, Z axis to zero
-:limit, ........... record current X, Y, Z co-ords as the maximum limit
-:set, :s $(color ul)wp$(color) ... set current X, Y, Z position as a waypoint \
-named $(color ul)wp$(color)
-:go, :g $(color ul)wp$(color) .... move X, Y, Z position it waypoint named \
-$(color ul)wp$(color)
-:list, :l ......... list all waypoints
-:exit, :e ......... exit from monitor
-:commands, :c ..... show commands
-$(color)"
-    echo "$helpText"
+    local _text="
+"
+    echo "$text"
 }
 
 case "$1" in
     '-h'|'--help'|'help')   _helpCmd;;
-    '--clear-device')       conRemoveStore;;
-    '--clear-waypoints')    wpRemoveSore;;
 esac
+
+# TODO: move functions processing lib file
+function _import {
+    local file=$1
+    local ln=0
+    if [ -r $file ]; then
+        while read line; do
+# TODO: Parse out comments
+            GCODE[$ln]="$line"
+            ln=$(($ln + 1))
+        done < $file
+        echo "$(color green)Imported $TOTAL_LINES lines of g-code.$(color)"
+    else
+        echo "$(color red)Unable to read $file$(color)"
+        _helpCmd
+        exit 1
+    fi
+}
+
+function _status {
+    local total=${#GCODE[@]}
+    local sline=$CURRENT_LINE
+    local eline=$(($CURRENT_LINE + $LINES_BATCHED))
+    echo "$(code bd white blue) \
+total: $total   processing: $sline to $eline \
+$(color)"
+}
 
 conOpen
 
@@ -83,18 +104,12 @@ while true; do
     [ "$MODE" == "$START_UP" ] && _helpLoop # offer some help on start up
     MODE=$RAW                               # default to raw mode
 
-    echo -n "$(color yellow)[monitor] > $(color)"
+    echo -n "$(color yellow)[sender] > $(color)"
     read input
 
     case "$input" in
         ':commands'|':c')   _helpLoop;;
         ':exit'|':e')       conClose;;
-        ':jog'|':j')        jogMode;;
-        ':home'|':h')       jogHome;;
-        ':limit')           wpStoreLimit;;
-        ':set'|':s')        wpStore $2;;
-        ':go'|':g')         wpGoto $2;;
-        ':list'|':l')       wpList;;
         *)  # Process raw input
             conSend "$input"
             echo
