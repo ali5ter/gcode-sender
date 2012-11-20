@@ -50,3 +50,46 @@ START_UP='Sizzling Abalone and Kale Chunks tossed with Stewed Meat'
 RAW='Creamy Rice Shish-Kebab on a bed of Dried Pulled Pork and Mussel Slices'
 JOG='Deep-fried Spam Sandwich with Turkey and Duck Sushi'
 MODE=$START_UP
+#
+# Keys
+#
+KEY_UP='27:91:65'
+KEY_DOWN='27:91:66'
+KEY_RIGHT='27:91:67'
+KEY_LEFT='27:91:68'
+KEY_ESC=27
+KEY_A=97
+KEY_Z=122
+KEY_H=104
+KEY_C=99
+
+#
+# Create token describing the key pressed.
+#
+# Useful for keystroke detection, e.g.
+#    while read -n1 -s char; do
+#        key=$(parseEscapeSeq $char)
+#        echo "char=$char , key=$key"
+#        case "$key" in
+#            $KEY_DOWN) echo'down';;
+#        esac
+#    done
+#
+function parseEscapeSeq {
+    local key=$(printf '%d' "'$1")
+    local ttyState=$(stty -g)
+    local chars=''
+    local charnum=''
+    [ $key -eq 27 ] && {
+        stty -icanon min 0 time 0
+        read -s chars
+        if [ ${#chars} -gt 0 ]; then
+            for (( i=0; i<${#chars}; i+=1 )); do
+                charnum=$(printf '%d' "'${chars:$i:1}")
+                key="$key:$charnum"
+            done
+        fi
+        stty $ttyState &>/dev/null
+    }
+    echo "$key"
+}

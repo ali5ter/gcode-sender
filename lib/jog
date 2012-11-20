@@ -37,19 +37,6 @@ ZPOS=0
 #
 JOG_STEP=5
 #
-# Keys
-#
-KEY_UP='27:91:65'
-KEY_DOWN='27:91:66'
-KEY_RIGHT='27:91:67'
-KEY_LEFT='27:91:68'
-KEY_ESC=27
-KEY_A=97
-KEY_Z=122
-KEY_H=104
-KEY_C=99
-
-#
 # Jog functions
 #
 jogXRight ()    { XPOS=$(( $XPOS + $JOG_STEP )); jogSend; }
@@ -90,25 +77,6 @@ $(color)"
     echo "$helpText"
 }
 
-function _parseEscapeSeq {
-    local key=$(printf '%d' "'$1")
-    local ttyState=$(stty -g)
-    local chars=''
-    local charnum=''
-    [ $key -eq 27 ] && {
-        stty -icanon min 0 time 0
-        read -s chars
-        if [ ${#chars} -gt 0 ]; then
-            for (( i=0; i<${#chars}; i+=1 )); do
-                charnum=$(printf '%d' "'${chars:$i:1}")
-                key="$key:$charnum"
-            done
-        fi
-        stty $ttyState &>/dev/null
-    }
-    echo "$key"
-}
-
 function jogMode {
     local char=''
     local key=''
@@ -116,7 +84,7 @@ function jogMode {
     jogCommands
     jogStatus
     while read -n1 -s char; do
-        key=$(_parseEscapeSeq $char)
+        key=$(parseEscapeSeq $char)
         #echo "char=$char , key=$key"
         case "$key" in
             $KEY_ESC)   MODE=$RAW; echo; break;;
