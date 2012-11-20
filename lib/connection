@@ -44,7 +44,7 @@ function conGetDevice {
     conRemoveDeviceStore
 
     local _ifs=$IFS
-    local devices=($(ls -1 /dev/cu.usb*))
+    local devices=($(ls -1 /dev/cu.usb* 2>/dev/null))
     local num=${#devices[@]}
     IFS=$_ifs
 
