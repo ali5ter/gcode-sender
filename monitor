@@ -57,7 +57,7 @@ function _helpLoop {
     local helpText="$(color yellow)$(color bd)Arduino GrblShield Serial \
 Monitor Tool commands:$(color)
 :jog, :j .......... enter jog mode
-:homei, :h ........ attempt to move X, Y, Z axis to zero
+:home, :h ........ attempt to move X, Y, Z axis to zero
 :limit, ........... record current X, Y, Z co-ords as the maximum limit
 :set, :s $(color ul)wp$(color) ... set current X, Y, Z position as a waypoint \
 named $(color ul)wp$(color)

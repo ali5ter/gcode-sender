@@ -27,12 +27,6 @@
 # SOFTWARE.
 
 #
-# Positions
-#
-XPOS=0
-YPOS=0
-ZPOS=0
-#
 # Jog step distance
 #
 JOG_STEP=5
