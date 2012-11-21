@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # @file waypoints
 # ☆  Waypoint manager for gcode_sender
@@ -37,20 +38,29 @@ function wpRemoveStore {
 
 function wpStore {
     local name=$1
+    echo "$(color yellow)Setting waypoint, $1, for co-ods $XPOS, $YPOS, \
+$ZPOS.$(color)"
     # TODO: record a wp to the store, e.g. name:X:Y:Z
+}
+
+function wpRemove {
+    local name=$1
+    echo "$(color yellow)Removing waypoint, $1$(color)"
+    # TODO: remove a wp from the store
 }
 
 function wpStoreLimit {
     wpStore LIMIT
+    echo "$(color yellow)Note: This waypoint is marked as the upper limit for \
+each axis$(color)"
     # TODO: Add limit check to jog feature
 }
 
-wpGetXLimit () { echo 100; }
-wpGetYLimit () { echo 100; }
-wpGetZLimit () { echo 100; }
-
 function wpGoto {
     local name=$1
+    # TODO: send wp co-ords to device
+    echo "$(color yellow)Moving to waypoint, $1, at co-ods $XPOS, $YPOS, \
+$ZPOS.$(color)"
     # TODO: send wp co-ords to device
 }
 

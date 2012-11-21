@@ -1,3 +1,4 @@
+# !/bin/bash
 #
 # @file core
 # ☆  Core vars and functions for gcode_sender
@@ -57,6 +58,12 @@ XPOS=0
 YPOS=0
 ZPOS=0
 #
+# Limits
+#
+XMAX=
+YMAX=
+ZMAX=
+#
 # Keys
 #
 KEY_UP='27:91:65'
@@ -68,6 +75,15 @@ KEY_A=97
 KEY_Z=122
 KEY_H=104
 KEY_C=99
+
+#
+# Return true (return 0) if variable given is undefined
+#
+function undefined {
+    if [ -z "${1+xxx}" ]; then return 0; fi # not set
+    if [ -z "$1" ] && [ "${1+xxx}" = "xxx" ]; then return 0; fi # set but empty
+    return 1
+}
 
 #
 # Create token describing the key pressed.

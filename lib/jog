@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # @file jog
 # ☆  Jog logic for gcode_sender
@@ -42,15 +43,17 @@ jogZDown ()     { ZPOS=$(( $ZPOS - $JOG_STEP )); jogSend; }
 jogHome ()      { XPOS=0; YPOS=0; ZPOS=0; jogSend; }
 jogSend ()      {
     [ $XPOS -lt 0 ] && XPOS=0
+    [ ! undefined $XMAX ] && [ $XPOS -gt $XMAX ] && XPOS=$XMAX
     [ $YPOS -lt 0 ] && YPOS=0
+    [ ! undefined $YMAX ] && [ $YPOS -gt $XMAX ] && YPOS=$YMAX
     [ $ZPOS -lt 0 ] && ZPOS=0
-    # TODO: How do you calculate the upper limits?
+    [ ! undefined $ZMAX ] && [ $ZPOS -gt $ZMAX ] && ZPOS=$ZMAX
     conSend "X$XPOS Y$YPOS Z$ZPOS";
 }
 
 function jogStatus {
     clear
-    printf "$(color bd white blue) Jog Mode: x=%04d y=%04d y=%04d $(color)\n" \
+    printf "$(color bd white blue) Jog Mode: x=%04d y=%04d z=%04d $(color)\n" \
         $XPOS $YPOS $ZPOS
 }
 
@@ -75,8 +78,8 @@ function jogMode {
     local char=''
     local key=''
     MODE=$JOG
-    jogCommands
     jogStatus
+    jogCommands
     while read -n1 -s char; do
         key=$(parseEscapeSeq $char)
         #echo "char=$char , key=$key"
@@ -89,7 +92,7 @@ function jogMode {
             $KEY_A)     jogZUp; jogStatus;;
             $KEY_Z)     jogZDown; jogStatus;;
             $KEY_H)     jogHome; jogStatus;;
-            $KEY_C)     echo; jogCommands; jogStatus;;
+            $KEY_C)     jogStatus; jogCommands;;
         esac
     done
     clear

@@ -56,16 +56,16 @@ $(color)
 function _helpLoop {
     local helpText="$(color yellow)$(color bd)Arduino GrblShield Serial \
 Monitor Tool commands:$(color)
-:jog, :j .......... enter jog mode
-:home, :h ........ attempt to move X, Y, Z axis to zero
-:limit, ........... record current X, Y, Z co-ords as the maximum limit
-:set, :s $(color ul)wp$(color) ... set current X, Y, Z position as a waypoint \
+:jog, :j ........ enter jog mode
+:home, :h ....... attempt to move X, Y, Z axis to zero
+:limit, ......... record current X, Y, Z co-ords as the maximum limit
+:set, :s $(color ul)wp$(color) ..... set current X, Y, Z position as a waypoint \
 named $(color ul)wp$(color)
-:go, :g $(color ul)wp$(color) .... move X, Y, Z position it waypoint named \
+:go, :g $(color ul)wp$(color) ...... move X, Y, Z position it waypoint named \
 $(color ul)wp$(color)
-:list, :l ......... list all waypoints
-:exit, :e ......... exit from monitor
-:commands, :c ..... show commands
+:list, :l ....... list all waypoints
+:exit, :e ....... exit from monitor
+:commands, :c ... show commands
 $(color)"
     echo "$helpText"
 }
@@ -85,19 +85,24 @@ while true; do
 
     echo -n "$(color yellow)[monitor] > $(color)"
     read input
+    cmd=$(echo $input | awk '{print $1}')
+    arg1=$(echo $input | awk '{print $2}')
 
-    case "$input" in
-        ':commands'|':c')   _helpLoop;;
-        ':exit'|':e')       conClose;;
-        ':jog'|':j')        jogMode;;
-        ':home'|':h')       jogHome;;
-        ':limit')           wpStoreLimit;;
-        ':set'|':s')        wpStore $2;;
-        ':go'|':g')         wpGoto $2;;
-        ':list'|':l')       wpList;;
-        *)  # Process raw input
-            conSend "$input"
-            echo
+    case "$cmd" in
+        :commands|:c)   _helpLoop;;
+        :exit|:e)       conClose;;
+        :jog|:j)        jogMode;;
+        :home|:h)       jogHome;;
+        :limit)         wpStoreLimit;;
+        :set|:s)        wpStore $arg1;;
+        :remove|:r)     wpRemove $arg1;;
+        :go|:g)         wpGoto $arg1;;
+        :list|:l)       wpList;;
+        * )  # Process raw input
+            [ "${input:0:1}" != ':' ] && {
+                conSend "$input"
+                echo
+            }
             ;;
     esac
 done
