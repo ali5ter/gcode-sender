@@ -1,11 +1,12 @@
-Monitor and g-code sender for the Arduino grblShield
+Monitor and g-code sender for the [Arduino grblShield](https://www.synthetos.com/project/grblshield/).
 
-Written so I could hook up my MacBookPro to my ShapeOko, test a few g-code
-instructions, mess with the grbl configuration, have a simple jog and waypoint
-system and stream some g-code files.
+Written so I could hook up my Mac to my [ShapeOko](http://www.shapeoko.com/wiki/),
+test a few g-code instructions, mess with the [grbl](https://github.com/grbl/grbl/wiki)
+configuration, implement a simple jog with waypoints and stream some g-code to
+get the CNC machine to dance.
 
-Warning: This is all command line and nothing as user-friendly as the Universal
-G-Code Sender
+Warning: This is all command line and nothing as user-friendly as the [Universal
+G-Code Sender](https://github.com/winder/Universal-G-Code-Sender)
 
 Status
 ------
@@ -13,8 +14,7 @@ Status
 * Jog feature done and being tested... mainly by my 5 year old son :)
 * Writing a simple waypoint manager. Panders to my laziness so I don't have to
   keep jog'ing back to the same position each time.
-* This waypoint manager could also provide a way to This way to configure a
-  stored limit for each axis.
+* This waypoint manager might also provide a way to store limits for each axis.
 * Started writing the framework for the g-code sender/streamer thingy.
 
 Dependencies
@@ -23,6 +23,7 @@ Dependencies
 
 References
 ----------
+* grblShield <http://www.synthetos.com/wiki/index.php?title=Projects:grblShield>
 * grbl <https://github.com/grbl/grbl/wiki>
 * g-code <http://linuxcnc.org/docs/html/gcode.html>
 * ShapeOko <http://www.shapeoko.com/wiki/>
