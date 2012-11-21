@@ -1,9 +1,10 @@
 Monitor and g-code sender for the [Arduino grblShield](https://www.synthetos.com/project/grblshield/).
 
-Written so I could hook up my Mac to my [ShapeOko](http://www.shapeoko.com/wiki/),
-test a few g-code instructions, mess with the [grbl](https://github.com/grbl/grbl/wiki)
-configuration, implement a simple jog with waypoints and stream some g-code to
-get the CNC machine to dance.
+Written so I could hook up my MacBook to my [ShapeOko](http://www.shapeoko.com/wiki/),
+test a few [g-code instructions](http://linuxcnc.org/docs/html/gcode.html),
+mess with the [grbl](https://github.com/grbl/grbl/wiki) configuration,
+implement a simple jog system devined with waypoints and stream some g-code to
+get said ShapeOko to dance.
 
 Warning: This is all command line and nothing as user-friendly as the [Universal
 G-Code Sender](https://github.com/winder/Universal-G-Code-Sender)
