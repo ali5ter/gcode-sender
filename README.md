@@ -1,4 +1,4 @@
-Monitor and g-code sender for the [Arduino grblShield](https://www.synthetos.com/project/grblshield/).
+Command line monitor and g-code sender for the [Arduino grblShield](https://www.synthetos.com/project/grblshield/).
 
 Written so I could hook up my MacBook to my [ShapeOko](http://www.shapeoko.com/wiki/),
 test a few [g-code instructions](http://linuxcnc.org/docs/html/gcode.html),
