@@ -12,10 +12,8 @@ G-Code Sender](https://github.com/winder/Universal-G-Code-Sender)
 Status
 ------
 * Monitor (ala the Arduino Serial Monitor Tool) complete.
-* Jog feature done and being tested... mainly by my 5 year old son :)
-* Writing a simple waypoint manager. Panders to my laziness so I don't have to
-  keep jog'ing back to the same position each time.
-* This waypoint manager might also provide a way to store limits for each axis.
+* Jog feature complete but still bugs with limit waypoint validation.
+* Waypoint manager feature complete but still bugs with marking the current waypoint in waypoint list.
 * Started writing the framework for the g-code sender/streamer thingy.
 
 Dependencies
