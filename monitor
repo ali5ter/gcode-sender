@@ -39,16 +39,14 @@ source $LIB/jog        # jog mode
 source $LIB/waypoints  # waypoint manager
 
 function _helpCmd {
-    local helpText="
-$(color bd)Arduino GrblShield Serial Monitor Tool$(color)
+    local helpText="$(color bd)Arduino GrblShield Serial Monitor Tool$(color)
 
 Usage: $(color bd)monitor [$(color ul)options$(color bd)]$(color)
 
 Options:
 --clear-device      Delete the stored USB device
 --clear-waypoints   Delete any stored waypoints
-$(color)
-"
+$(color)"
     echo "$helpText"
     exit 0;
 }
@@ -73,7 +71,7 @@ $(color)"
 case "$1" in
     '-h'|'--help'|'help')   _helpCmd;;
     '--clear-device')       conRemoveStore;;
-    '--clear-waypoints')    wpRemoveSore;;
+    '--clear-waypoints')    wpClearStore;;
 esac
 
 conOpen
@@ -98,11 +96,11 @@ while true; do
         :remove|:r)     wpRemove $arg1;;
         :go|:g)         wpGoto $arg1;;
         :list|:l)       wpList;;
-        * )  # Process raw input
-            [ "${input:0:1}" != ':' ] && {
+        * ) # Process raw input
+            if [ "${input:0:1}" != ':' ]; then
                 conSend "$input"
                 echo
-            }
+            else _helpLoop; fi
             ;;
     esac
 done

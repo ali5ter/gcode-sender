@@ -32,39 +32,72 @@
 #
 WAYPOINT_STORE=~/.gcode_sender_waypoints
 
-function wpRemoveStore {
+function wpExists {
+    local matches=$(grep "^$1:" $WAYPOINT_STORE | wc -l)
+    [ "$matches" -gt '0' ] && return 0
+    return 1
+}
+
+function wpClearStore {
     rm -f $WAYPOINT_STORE 2>/dev/null
+    touch $WAYPOINT_STORE
 }
 
 function wpStore {
     local name=$1
-    echo "$(color yellow)Setting waypoint, $1, for co-ods $XPOS, $YPOS, \
-$ZPOS.$(color)"
-    # TODO: record a wp to the store, e.g. name:X:Y:Z
+    wpExists $name
+    if [ $? -eq 1 ]; then
+        echo "$name:$XPOS:$YPOS:$ZPOS" >> $WAYPOINT_STORE
+        echo "Waypoint has been added"
+    else
+        echo "This waypoint already exists:"
+        wpList
+    fi
 }
 
 function wpRemove {
     local name=$1
-    echo "$(color yellow)Removing waypoint, $1$(color)"
-    # TODO: remove a wp from the store
+    wpExists $name
+    if [ $? -eq 0 ]; then
+        sed -i"*.bak" "/^$name:/d" $WAYPOINT_STORE &&
+            echo "Waypoint has been removed"
+    else
+        echo "Unable to find waypoint '$name':"
+        wpList
+    fi
 }
 
 function wpStoreLimit {
     wpStore LIMIT
-    echo "$(color yellow)Note: This waypoint is marked as the upper limit for \
-each axis$(color)"
-    # TODO: Add limit check to jog feature
+    echo "Note: This waypoint is marked as the upper limit for each axis."
+    XMAX=$XPOS; YMAX=$YPOS; ZMAX=$ZPOS
 }
 
 function wpGoto {
     local name=$1
-    # TODO: send wp co-ords to device
-    echo "$(color yellow)Moving to waypoint, $1, at co-ods $XPOS, $YPOS, \
-$ZPOS.$(color)"
-    # TODO: send wp co-ords to device
+    wpExists $name
+    if [ $? -eq 0 ]; then
+        split ':' $(grep $name $WAYPOINT_STORE) wp
+        XPOS=${wp[1]}; YPOS=${wp[2]}; ZPOS=${wp[3]}
+        echo "Moving to waypoint '$name'"
+        jogSend
+    else
+        echo "Unable to find waypoint '$name':"
+        wpList
+    fi
 }
 
 function wpList {
-    # TODO: list wps
-    echo 'list of wps'
+    local current="$(color blue)►$(color)"
+    local wp
+    local state
+    while read line; do
+        split ':' $line wp
+        state=' '
+        [ $XPOS -eq ${wp[1]} ] &&
+        [ $YPOS -eq ${wp[2]} ] &&
+        [ $ZPOS -eq ${wp[3]} ] && state=$current
+        printf "%1s $(color bd)%-10s$(color) %04d, %04d, %04d\n" \
+           $state ${wp[0]} ${wp[1]} ${wp[2]} ${wp[3]}
+    done < $WAYPOINT_STORE
 }

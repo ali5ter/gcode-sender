@@ -31,7 +31,7 @@
 #
 # Device store file
 #
-DEVICE_STORE=~/.gcode_device_store
+DEVICE_STORE=~/.gcode_sender_device
 
 function conRemoveStore {
     rm -fR $DEVICE_STORE 2>/dev/null

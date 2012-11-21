@@ -42,7 +42,7 @@ LISTENER=$LIB/listener
 #
 # PID of the listener script
 #
-LISTENER_PID=''
+LISTENER_PID=
 #
 # Modes
 # @see http://phrasegenerator.com/food
@@ -77,7 +77,18 @@ KEY_H=104
 KEY_C=99
 
 #
+#   Split a delimited string into an array
+#   e.g. split 'delim' 'string' array_name
+#
+function split {
+    local _ifs=$IFS
+    IFS="$1" read -ra $3 <<< "$2"
+    IFS=$_ifs
+}
+
+#
 # Return true (return 0) if variable given is undefined
+# e.g. [ undefined $foo ] && echo "$foo not defined"
 #
 function undefined {
     if [ -z "${1+xxx}" ]; then return 0; fi # not set
