@@ -52,6 +52,10 @@ RAW='Creamy Rice Shish-Kebab on a bed of Dried Pulled Pork and Mussel Slices'
 JOG='Deep-fried Spam Sandwich with Turkey and Duck Sushi'
 MODE=$START_UP
 #
+# Debug flag
+#
+DEBUG=0
+#
 # Positions
 #
 XPOS=0
@@ -75,6 +79,12 @@ KEY_A=97
 KEY_Z=122
 KEY_H=104
 KEY_C=99
+KEY_R=114
+
+function toggleDebug {
+    if ((DEBUG==1)); then ((DEBUG=0))
+    else ((DEBUG=1)); fi;
+}
 
 #
 #   Split a delimited string into an array

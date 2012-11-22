@@ -1,4 +1,4 @@
-# !/bin/bash
+#!/bin/bash
 #
 # @file connection
 # ☆  Connection functions for gcode_sender
@@ -103,4 +103,11 @@ function conListen {
 
 function conUnListen {
     kill -9 $LISTENER_PID &>/dev/null
+}
+
+function conReport {
+    printf "x=%04d/%04d y=%04d/%04d z=%04d/%04d\n" $XPOS $XMAX $YPOS $YMAX \
+        $ZPOS $ZMAX
+    echo "?" > $DEVICE  # real time grbl position
+    sleep 1 # wait for Arduino to respond
 }

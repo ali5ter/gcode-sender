@@ -59,7 +59,7 @@ function wpRemove {
     local name=$1
     wpExists $name
     if [ $? -eq 0 ]; then
-        sed -i"*.bak" "/^$name:/d" $WAYPOINT_STORE &&
+        sed "/^$name:/d" $WAYPOINT_STORE &&
             echo "Waypoint has been removed"
     else
         echo "Unable to find waypoint '$name':"
@@ -71,6 +71,13 @@ function wpStoreLimit {
     wpStore LIMIT
     echo "Note: This waypoint is marked as the upper limit for each axis."
     XMAX=$XPOS; YMAX=$YPOS; ZMAX=$ZPOS
+}
+
+function wpGetLimit {
+    if wpExists 'LIMIT'; then
+        split ':' $(grep 'LIMIT' $WAYPOINT_STORE) wp
+        XMAX=${wp[1]}; YMAX=${wp[2]}; ZMAX=${wp[3]}
+    fi
 }
 
 function wpGoto {

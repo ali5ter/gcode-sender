@@ -54,16 +54,17 @@ $(color)"
 function _helpLoop {
     local helpText="$(color yellow)$(color bd)Arduino GrblShield Serial \
 Monitor Tool commands:$(color)
-:jog, :j ........ enter jog mode
-:home, :h ....... attempt to move X, Y, Z axis to zero
-:limit, ......... record current X, Y, Z co-ords as the maximum limit
-:set, :s $(color ul)wp$(color) ..... set current X, Y, Z position as a waypoint \
-named $(color ul)wp$(color)
+:commands, :c ... show commands
 :go, :g $(color ul)wp$(color) ...... move X, Y, Z position it waypoint named \
 $(color ul)wp$(color)
-:list, :l ....... list all waypoints
 :exit, :e ....... exit from monitor
-:commands, :c ... show commands
+:home, :h ....... attempt to move X, Y, Z axis to zero
+:jog, :j ........ enter jog mode
+:list, :l ....... list all waypoints
+:limit, ......... record current X, Y, Z co-ords as the maximum limit
+:report, :r ..... report position and state
+:set, :s $(color ul)wp$(color) ..... set current X, Y, Z position as a waypoint \
+named $(color ul)wp$(color)
 $(color)"
     echo "$helpText"
 }
@@ -75,6 +76,7 @@ case "$1" in
 esac
 
 conOpen
+wpGetLimit
 
 while true; do
 
@@ -88,6 +90,7 @@ while true; do
 
     case "$cmd" in
         :commands|:c)   _helpLoop;;
+        :report|:r)     conReport;;
         :exit|:e)       conClose;;
         :jog|:j)        jogMode;;
         :home|:h)       jogHome;;

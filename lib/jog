@@ -45,9 +45,9 @@ jogSend ()      {
     [ $XPOS -lt 0 ] && XPOS=0
     if [ ! -z $XMAX ]; then [ "$XPOS" -gt "$XMAX" ] && XPOS=$XMAX; fi
     [ $YPOS -lt 0 ] && YPOS=0
-    if [ ! -z $YMAX ]; then [ "$YPOS" -gt "$YMAX" ] && XPOS=$YMAX; fi
+    if [ ! -z $YMAX ]; then [ "$YPOS" -gt "$YMAX" ] && YPOS=$YMAX; fi
     [ $ZPOS -lt 0 ] && ZPOS=0
-    if [ ! -z $ZMAX ]; then [ "$ZPOS" -gt "$ZMAX" ] && XPOS=$ZMAX; fi
+    if [ ! -z $ZMAX ]; then [ "$ZPOS" -gt "$ZMAX" ] && ZPOS=$ZMAX; fi
     conSend "X$XPOS Y$YPOS Z$ZPOS";
 }
 
@@ -59,6 +59,7 @@ function jogStatus {
 
 function jogCommands {
     local helpText="$(color yellow)
+c .............. show commands
 escape ......... exit jog mode
 cursor up ...... Y backward one step
 cursor down .... Y forward one step
@@ -67,7 +68,6 @@ cursor right ... X right one step
 a .............. X up one step
 z .............. Z up one step
 h .............. home
-c .............. show commands
 
 Jog step set to $JOG_STEP actual steps.
 $(color)"
