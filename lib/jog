@@ -43,11 +43,11 @@ jogZDown ()     { ZPOS=$(( $ZPOS - $JOG_STEP )); jogSend; }
 jogHome ()      { XPOS=0; YPOS=0; ZPOS=0; jogSend; }
 jogSend ()      {
     [ $XPOS -lt 0 ] && XPOS=0
-    [ ! undefined $XMAX ] && [ $XPOS -gt $XMAX ] && XPOS=$XMAX
+    if [ ! -z $XMAX ]; then [ "$XPOS" -gt "$XMAX" ] && XPOS=$XMAX; fi
     [ $YPOS -lt 0 ] && YPOS=0
-    [ ! undefined $YMAX ] && [ $YPOS -gt $XMAX ] && YPOS=$YMAX
+    if [ ! -z $YMAX ]; then [ "$YPOS" -gt "$YMAX" ] && XPOS=$YMAX; fi
     [ $ZPOS -lt 0 ] && ZPOS=0
-    [ ! undefined $ZMAX ] && [ $ZPOS -gt $ZMAX ] && ZPOS=$ZMAX
+    if [ ! -z $ZMAX ]; then [ "$ZPOS" -gt "$ZMAX" ] && XPOS=$ZMAX; fi
     conSend "X$XPOS Y$YPOS Z$ZPOS";
 }
 

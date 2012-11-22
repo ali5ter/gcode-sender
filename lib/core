@@ -1,4 +1,4 @@
-# !/bin/bash
+#!/bin/bash
 #
 # @file core
 # ☆  Core vars and functions for gcode_sender
@@ -86,17 +86,6 @@ function split {
     IFS=$_ifs
 }
 
-#
-# Return true (return 0) if variable given is undefined
-# e.g. [ undefined $foo ] && echo "$foo not defined"
-#
-function undefined {
-    if [ -z "${1+xxx}" ]; then return 0; fi # not set
-    if [ -z "$1" ] && [ "${1+xxx}" = "xxx" ]; then return 0; fi # set but empty
-    return 1
-}
-
-#
 # Create token describing the key pressed.
 #
 # Useful for keystroke detection, e.g.

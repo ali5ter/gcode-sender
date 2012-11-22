@@ -89,8 +89,8 @@ function wpGoto {
 
 function wpList {
     local current="$(color blue)►$(color)"
-    local wp
-    local state
+    local wp=''
+    local state=' '
     while read line; do
         split ':' $line wp
         state=' '
@@ -98,6 +98,6 @@ function wpList {
         [ $YPOS -eq ${wp[2]} ] &&
         [ $ZPOS -eq ${wp[3]} ] && state=$current
         printf "%1s $(color bd)%-10s$(color) %04d, %04d, %04d\n" \
-           $state ${wp[0]} ${wp[1]} ${wp[2]} ${wp[3]}
+           "$state" ${wp[0]} ${wp[1]} ${wp[2]} ${wp[3]}
     done < $WAYPOINT_STORE
 }
