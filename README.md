@@ -6,8 +6,8 @@ mess with the [grbl](https://github.com/grbl/grbl/wiki) configuration,
 implement a simple jog system devined with waypoints and stream some g-code to
 get said ShapeOko to dance.
 
-Warning: This is all command line (bash actually) and nothing as user-friendly as the [Universal
-G-Code Sender](https://github.com/winder/Universal-G-Code-Sender)
+Warning: This is all command line (bash actually). It is crude and simplistic.
+For a better solution, go take a look at the [Universal G-Code Sender](https://github.com/winder/Universal-G-Code-Sender)
 
 Status
 ------
