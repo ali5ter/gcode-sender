@@ -74,14 +74,16 @@ case "$1" in
 esac
 
 # TODO: move functions processing lib file
-function import {
+function cImport {
     local file=$1
     local ln=0
     if [ -r $file ]; then
         while read line; do
-# TODO: Parse out comments
-            GCODE[$ln]="$line"
-            ln=$(($ln + 1))
+            line=$(echo $line | sed 's/(.*)//')
+            [ -n "$line" ] && {
+                GCODE[$ln]="$line"
+                ln=$(($ln + 1))
+            }
         done < $file
         TOTAL_LINES=${#GCODE[@]}
         echo "$(color green)Imported $TOTAL_LINES lines of g-code.$(color)"
@@ -90,6 +92,17 @@ function import {
         _helpCmd
         exit 1
     fi
+}
+
+function cList {
+    # TODO: show imported g-code
+    echo 'list code'
+}
+
+function cSend {
+    # TODO: Send imported g-code to device in batches
+    # TODO: Like jog mode, check keystrokes for pause, stop, step, etc.
+    echo 'send code'
 }
 
 function _status {
@@ -101,7 +114,7 @@ total: $total   processing: $sline to $eline \
 $(color)"
 }
 
-import $GCODE_FILE
+cImport $GCODE_FILE
 conOpen
 
 while true; do
@@ -113,8 +126,10 @@ while true; do
     read input
 
     case "$input" in
-        ':commands'|':c')   _helpLoop;;
-        ':exit'|':e')       conClose;;
+        :commands|:c)   helpLoop;;
+        :exit|:e)       conClose;;
+        :list|:l)          cList;;
+        :send|:s)          cSend;;
         *)  # Process raw input
             conSend "$input"
             echo

@@ -1,13 +1,14 @@
 (Draw a circle)
 (@see https://github.com/grbl/grbl/wiki/G-Code-Examples)
+( Select XY plane, inches, absolute distance mode, units/minute feed rate, co-ord system 1)
 G17 G20 G90 G94 G54
-G0 Z0.25
-X-0.5 Y0.
-Z0.1
-G01 Z0. F5.
-G02 X0. Y0.5 I0.5 J0. F2.5
-X0.5 Y0. I0. J-0.5
-X0. Y-0.5 I-0.5 J0.
-X-0.5 Y0. I0. J0.5
-G01 Z0.1 F5.
-G00 X0. Y0. Z0.25
+G0 Z0.25 (Rapid montion, z:1/4" up)
+X-0.5 Y0. (x:-1/2" left)
+Z0.1 (z:1/10" up)
+G01 Z0. F5. (z:home, feed-rate of 5)
+G02 X0. Y0.5 I0.5 J0. F2.5 (c/w arc, end at x:0,y:1/2", offset x:1/2",y:0, feed-rate of 2.5)
+X0.5 Y0. I0. J-0.5 (c/w arc, end at x:1/2",y:0, offset x:0,y:-1/2")
+X0. Y-0.5 I-0.5 J0. (c/w arc, end at x:),y:-1/2", offset x:-1/2,y:0")
+X-0.5 Y0. I0. J0.5 (c/w arc, end at x:-1/2",y:0, offset x:0,y:1/2")
+G01 Z0.1 F5. (z:1/10" up, feed-rate of 5)
+G00 X0. Y0. Z0.25 (Rapid montion, x,y: home, z:1/4" up)
