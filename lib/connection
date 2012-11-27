@@ -45,6 +45,9 @@ function conGetDevice {
     conRemoveStore
 
     local _ifs=$IFS
+    # TODO: Filter device based on OS
+    # OSX: ls -1 /dev/cu.usb*
+    # Ubuntu/Linux: ls -1 /dev/ttyACM0
     local devices=($(ls -1 /dev/cu.usb* 2>/dev/null))
     local num=${#devices[@]}
     IFS=$_ifs
@@ -90,6 +93,12 @@ function conClose {
 
 function conSend {
     local input="$1"
+    #
+    # On Linux you may not have permission to write to the Arduino USB device.
+    # On Ubuntu you can correct this using:
+    # sudo usermod -a -G dialout <your_user>
+    # sudo chmod a+rw /dev/ttyACM0
+    #
     [ -z $DEVICE ] && return 1;
     echo "$input" > $DEVICE
     sleep 1 # wait for Arduino to respond
