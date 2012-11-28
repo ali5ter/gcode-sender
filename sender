@@ -34,25 +34,9 @@
 LIB=$( cd "$( dirname "$0" )" && pwd )/lib
 source $LIB/core       # core vars and functions
 source $LIB/connection # connection logic
-#
-# G-code file
-GCODE_FILE=$1
-#
-# G-code instructions
-#
-GCODE=()
-#
-# Total g-code instructions
-#
-TOTAL_LINES=
-#
-# Current g-code instruction
-#
-CURRENT_LINE=0
-#
-# Current g-code instruction
-#
-LINES_BATCHED=3
+source $LIB/jog        # jog logic
+source $LIB/waypoints  # waypoint manager
+source $LIB/send       # g-code logic
 
 function _helpCmd {
     local helpText="
@@ -73,49 +57,9 @@ case "$1" in
     '-h'|'--help'|'help')   _helpCmd;;
 esac
 
-# TODO: move functions processing lib file
-function cImport {
-    local file=$1
-    local ln=0
-    if [ -r $file ]; then
-        while read line; do
-            line=$(echo $line | sed 's/(.*)//')
-            [ -n "$line" ] && {
-                GCODE[$ln]="$line"
-                ln=$(($ln + 1))
-            }
-        done < $file
-        TOTAL_LINES=${#GCODE[@]}
-        echo "$(color green)Imported $TOTAL_LINES lines of g-code.$(color)"
-    else
-        echo "$(color red)Unable to read $file$(color)"
-        _helpCmd
-        exit 1
-    fi
-}
-
-function cList {
-    # TODO: show imported g-code
-    echo 'list code'
-}
-
-function cSend {
-    # TODO: Send imported g-code to device in batches
-    # TODO: Like jog mode, check keystrokes for pause, stop, step, etc.
-    echo 'send code'
-}
-
-function _status {
-    local total=${#GCODE[@]}
-    local sline=$CURRENT_LINE
-    local eline=$(($CURRENT_LINE + $LINES_BATCHED))
-    echo "$(code bd white blue) \
-total: $total   processing: $sline to $eline \
-$(color)"
-}
-
-cImport $GCODE_FILE
+sendImport $GCODE_FILE
 conOpen
+wpGetLimit
 
 while true; do
 
@@ -126,13 +70,15 @@ while true; do
     read input
 
     case "$input" in
-        :commands|:c)   helpLoop;;
+        :commands|:c)   _helpLoop;;
         :exit|:e)       conClose;;
         :list|:l)          cList;;
         :send|:s)          cSend;;
-        *)  # Process raw input
-            conSend "$input"
-            echo
+        * ) # Process raw input
+            if [ "${input:0:1}" != ':' ]; then
+                conSend "$input"
+                echo
+            else _helpLoop; fi
             ;;
     esac
 done
