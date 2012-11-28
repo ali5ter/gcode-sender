@@ -28,6 +28,11 @@
 # SOFTWARE.
 
 #
+# Operating system
+# e.g. Linux, Darwin (OSX)
+#
+OS="$(uname)"
+#
 # Starting directory
 #
 BASE=$( cd "$( dirname "$0" )" && pwd )

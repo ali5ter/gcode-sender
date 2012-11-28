@@ -45,10 +45,10 @@ function conGetDevice {
     conRemoveStore
 
     local _ifs=$IFS
-    # TODO: Filter device based on OS
-    # OSX: ls -1 /dev/cu.usb*
-    # Ubuntu/Linux: ls -1 /dev/ttyACM0
-    local devices=($(ls -1 /dev/cu.usb* 2>/dev/null))
+    local filter='/dev/*'
+    [ "$OS" == 'Darwin' ] && filter='/dev/cu.usb*'
+    [ "$OS" == 'Linux' ] && filter='/dev/ttyACM0'
+    local devices=($(ls -1 $filter 2>/dev/null))
     local num=${#devices[@]}
     IFS=$_ifs
 
@@ -105,9 +105,11 @@ function conSend {
 }
 
 function conListen {
+set -x
     [ -z $DEVICE ] && return 1;
     $LISTENER &
     LISTENER_PID=$(ps aux | grep $LISTENER | grep -v 'grep' | awk '{print $2}')
+    set +x
 }
 
 function conUnListen {

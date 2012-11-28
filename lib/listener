@@ -34,7 +34,9 @@ BASE=$( cd "$( dirname "$0" )" && pwd )
 source $BASE/connection # connection logic
 
 conGetDevice
+cat <$DEVICE
 
 # TODO: Find a way to format output through parsing
 
-cat <$DEVICE
+# TODO: On Ubuntu redirecting to cat drops instantly
+
