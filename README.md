@@ -1,3 +1,5 @@
+> **⚠️ Archived 2025-08-25. No longer maintained.**
+
 Command line monitor and g-code sender for the [Arduino grblShield](https://www.synthetos.com/project/grblshield/).
 
 Written so I could hook up my MacBook to my [ShapeOko](http://www.shapeoko.com/wiki/),
